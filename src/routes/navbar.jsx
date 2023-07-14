@@ -44,17 +44,31 @@ const Navbar = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   return (
     <div>
-      <div className="bg-emerald-800 text-black p-4 flex flex-row justify-end">
+      <div className="bg-emerald-800 text-black p-4 flex flex-row justify-between">
+        <div>
+          <Link
+            className="text-white text-xl bg-stone-800 rounded-lg py-1 px-2"
+            to={"/posts"}
+          >
+            Posts
+          </Link>
+        </div>
         <div className="relative">
           <FontAwesomeIcon
             className="text-2xl text-white cursor-pointer"
             onClick={() => setDropdownVisible(!dropdownVisible)}
             icon={faUser}
           />
-          {dropdownVisible && <UserDropdown user={{ username: "user" }} />}
+          {dropdownVisible && (
+            <UserDropdown
+              user={{ username: sessionStorage.getItem("username") }}
+            />
+          )}
         </div>
       </div>
-      <Outlet />
+      <div className="textured-bg">
+        <Outlet />
+      </div>
     </div>
   );
 };

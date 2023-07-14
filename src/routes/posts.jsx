@@ -15,9 +15,10 @@ import Select from "react-select";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
+import { handlePostUpload } from "../api";
 const notify = (text) => toast(text);
 
-const ControlledInput = ({ value, onValueChange, ...rest }) => {
+export const ControlledInput = ({ value, onValueChange, ...rest }) => {
   return (
     <input
       value={value}
@@ -35,7 +36,7 @@ const ControlledFileInput = ({ onValueChange, ...rest }) => {
     />
   );
 };
-const VotingSystem = ({ voting, handleVoting }) => {
+export const VotingSystem = ({ voting, handleVoting }) => {
   return (
     <div className="flex flex-row gap-2 items-center justify-center">
       <FontAwesomeIcon
@@ -58,7 +59,7 @@ const VotingSystem = ({ voting, handleVoting }) => {
     </div>
   );
 };
-const PostDetails = ({ post, handleClose }) => {
+export const PostDetails = ({ post, handleClose }) => {
   return (
     <div className="absolute top-1/2 left-1/2 bg-slate-700 translate-x-[-50%] z-40 translate-y-[-50%] p-2 m-4 backdrop-blur-2xl">
       <FontAwesomeIcon icon={faXmarkCircle} onClick={handleClose} />
@@ -89,7 +90,7 @@ const PostDetails = ({ post, handleClose }) => {
     </div>
   );
 };
-const Comments = ({ post, retrigger }) => {
+export const Comments = ({ post, retrigger }) => {
   const [newComment, setNewComment] = useState({
     content: "",
     author: "admin",
@@ -174,7 +175,7 @@ const Comments = ({ post, retrigger }) => {
     </div>
   );
 };
-const Post = ({ postInfo, retrigger }) => {
+export const Post = ({ postInfo, retrigger }) => {
   const [voting, setVoting] = useState({
     votes: postInfo.postVotes,
     hadVotedPlus: false,
@@ -241,7 +242,9 @@ const Post = ({ postInfo, retrigger }) => {
         <span className="text-gray-300 text-sm">
           {" "}
           by{" "}
-          <Link className="" to={`/user/${postInfo.postAuthor}`}>{postInfo.postAuthor}</Link>
+          <Link className="" to={`/user/${postInfo.postAuthor}`}>
+            {postInfo.postAuthor}
+          </Link>
         </span>
       </h2>
       <div className="flex flex-row justify-between gap-2 mx-6 pb-2">
@@ -268,60 +271,49 @@ const Post = ({ postInfo, retrigger }) => {
     </div>
   );
 };
-const Modal = ({ handleClose, retrigger }) => {
+export const NewPostModal = ({ handleClose, retrigger }) => {
   const [newPostData, setNewPostData] = useState({
     postTitle: "",
-    postAuthor: "admin",
+    postAuthor: sessionStorage.getItem("username"),
     postVotes: 1,
     postTimestamp: new Date(),
     postComments: [],
     postImage: "",
   });
 
-  function handlePostUpload() {
-    console.log(newPostData);
-    axios
-      .post(`http://localhost:3000/api/posts/create`, newPostData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          notify("Post created");
-          handleClose();
-          retrigger("sdad");
-        } else {
-          console.log("Not ok");
-        }
-      });
-  }
-
   return (
     <>
-      <div className="absolute top-1/2 left-1/2 bg-slate-700 translate-x-[-50%] z-30 translate-y-[-50%] p-2 m-4 backdrop-blur-2xl">
-        <h1>Create a post</h1>
-        <ControlledInput
-          value={newPostData.postTitle}
-          onValueChange={(value) =>
-            setNewPostData({ ...newPostData, postTitle: value })
-          }
-          placeholder="Post title"
-        />
-        <ControlledFileInput
-          accept="image/png, image/jpeg"
-          onValueChange={(file) =>
-            setNewPostData({ ...newPostData, postImage: file })
-          }
-        />
-        <button onClick={handlePostUpload}>Create</button>
+      <div className="absolute top-1/2 left-1/2 bg-emerald-700 rounded-xl translate-x-[-50%] z-30 translate-y-[-50%] p-2 m-4">
+        <div className="flex flex-col space-y-4">
+          <h1>Create a post</h1>
+          <ControlledInput
+            value={newPostData.postTitle}
+            onValueChange={(value) =>
+              setNewPostData({ ...newPostData, postTitle: value })
+            }
+            placeholder="Post title"
+          />
+          <ControlledFileInput
+            accept="image/png, image/jpeg"
+            onValueChange={(file) =>
+              setNewPostData({ ...newPostData, postImage: file })
+            }
+          />
+          <button
+            onClick={() =>
+              handlePostUpload(newPostData, notify, handleClose, retrigger)
+            }
+          >
+            Create
+          </button>
+        </div>
       </div>
       <div className="absolute w-full h-full top-0 left-0 z-20 bg-black/50"></div>
     </>
   );
 };
 
-const Posts = () => {
+export const Posts = () => {
   const [posts, setPosts] = useState([]);
   const [modalShown, setModalShown] = useState(false);
   const [detailedPost, setDetailedPost] = useState({
@@ -366,15 +358,19 @@ const Posts = () => {
     <div className="flex flex-row justify-center">
       <div className="flex flex-col">
         <div className="flex flex-row items-center">
-          <button className="m-4" onClick={() => setModalShown(true)}>
+          <button
+            className="m-4 bg-emerald-700 hover:border-white hover:border hover:scale-105 transition-transform"
+            onClick={() => setModalShown(true)}
+          >
             Create a new post
           </button>
           <Select
             defaultValue={query}
-            onChange={(value) => setQuery(value.value)}
+            onChange={(value) => {
+              setQuery(value.value), setTrigger("dsss");
+            }}
             className="text-black bg-stone-600"
             options={queryOptions}
-            defaultInputValue={query}
             placeholder="Filter"
           />
         </div>
@@ -400,7 +396,7 @@ const Posts = () => {
         )}
       </div>
       {modalShown && (
-        <Modal handleClose={handleModalClose} retrigger={setTrigger} />
+        <NewPostModal handleClose={handleModalClose} retrigger={setTrigger} />
       )}
       {detailedPost.isShown && (
         <PostDetails
@@ -412,5 +408,3 @@ const Posts = () => {
     </div>
   );
 };
-
-export default Posts;

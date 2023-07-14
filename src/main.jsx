@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Posts from "./routes/posts";
+import { Posts } from "./routes/posts";
 import Login from "./routes/login";
 import SignUp from "./routes/singUp";
 import ProtectedRoute from "./routes/protectedRoute";
@@ -37,7 +37,7 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/signup",
+    path: "/register",
     element: <SignUp />,
   },
 ]);

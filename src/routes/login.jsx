@@ -1,9 +1,10 @@
 /* eslint-disable react/prop-types */
-import axios from "axios";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { handleLogin } from "../api";
+
 const notify = (text) => toast(text);
 const ControlledInput = ({ value, onValueChange, ...rest }) => {
   return (
@@ -15,16 +16,12 @@ const ControlledInput = ({ value, onValueChange, ...rest }) => {
   );
 };
 
-function setToken(userToken) {
-  sessionStorage.setItem("token", JSON.stringify(userToken));
-}
 const Login = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  //const [email, setEmail] = useState("");
 
-  const handleRegister = () => {
+  /* const register = () => {
     axios
       .post(`http://localhost:3000/api/auth/signin`, {
         username: username,
@@ -39,10 +36,11 @@ const Login = () => {
           notify(err.response.data.msg);
         }
       });
-  };
+  }; */
+
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      handleRegister();
+      handleLogin(username, password, navigate, notify);
     }
   };
 
@@ -65,7 +63,14 @@ const Login = () => {
             placeholder="Password"
             onValueChange={setPassword}
           />
-          <button onClick={handleRegister}>Sign in</button>
+          <button
+            onClick={() => handleLogin(username, password, navigate, notify)}
+          >
+            Sign in
+          </button>
+          <p className="text-blue-500 text-lg text-center font-semibold">
+            <Link to={"/register"}>Register</Link>
+          </p>
         </div>
       </div>
       <ToastContainer theme="dark" />

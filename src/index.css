@@ -73,7 +73,8 @@ button:focus-visible {
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
-  mask-image: linear-gradient(black 10%, transparent);
-  filter: sepia(0.1);
-  backdrop-filter: blur(24px);
+  mask-image: linear-gradient(rgba(0, 0, 0, 0.342), black, transparent);
+}
+.textured-bg{
+  background-image: url(./assets/textured_bg.jpg);
 }
