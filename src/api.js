@@ -1,13 +1,13 @@
 import axios from "axios";
-import { func } from "prop-types";
-const token = sessionStorage.getItem("token");
+//const token = sessionStorage.getItem("token");
 function setToken(userToken) {
   sessionStorage.setItem("token", JSON.stringify(userToken));
 }
+import { url } from "./main";
 
 export const handleLogin = async (username, password, navigate, notify) => {
   axios
-    .post(`http://localhost:3000/api/auth/signin`, {
+    .post(`${url}/api/auth/signin`, {
       username: username,
       password: password,
     })
@@ -16,15 +16,13 @@ export const handleLogin = async (username, password, navigate, notify) => {
       sessionStorage.setItem("username", username);
       navigate("/posts");
     })
-    .catch((err) => {
-      if (err.response.status === 403) {
-        notify(err.response.data.msg);
-      }
+    .catch(() => {
+      notify("An error ocurred.");
     });
 };
 export const handleRegister = async (userDetails, navigate) => {
   axios
-    .post(`http://localhost:3000/api/auth/signup`, userDetails, {
+    .post(`${url}/api/auth/signup`, userDetails, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -36,14 +34,14 @@ export const handleRegister = async (userDetails, navigate) => {
     });
 };
 
-export function getUserData(username, notify) {
-  return axios.get(`http://localhost:3000/api/user/${username}/query`);
+export function getUserData(username) {
+  return axios.get(`${url}/api/user/${username}/query`);
 }
 export function getUserName() {}
 export function handlePostUpload(newPostData, notify, handleClose, retrigger) {
   console.log(newPostData);
   axios
-    .post(`http://localhost:3000/api/posts/create`, newPostData, {
+    .post(`${url}/api/posts/create`, newPostData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -58,3 +56,22 @@ export function handlePostUpload(newPostData, notify, handleClose, retrigger) {
       }
     });
 }
+export const getComments = async (postId) => {
+  return axios.get(`${url}/api/posts/comments/${postId}`);
+};
+export const getUserComments = async (username) => {
+  return axios.get(`${url}/api/user/${username}/comments`);
+};
+export const getPost = async (postId) => {
+  return axios.get(`${url}/api/posts/query/${postId}`);
+};
+export const postComment = (post, newComment, notify, retrigger) => {
+  axios
+    .post(`${url}/api/posts/${post._id}/comments/add`, newComment)
+    .then((res) => {
+      if (res.status === 200) {
+        notify("Comment submited");
+        retrigger("fssdf");
+      }
+    });
+};

@@ -50,21 +50,24 @@ const Login = () => {
         onKeyDown={handleKeyDown}
         className="flex items-center justify-center loginPage h-screen"
       >
-        <div className="flex flex-col gap-3 p-4 py-6 test rounded-lg">
+        <div className="flex flex-col gap-3 p-4 py-6 test rounded-xl backdrop-blur-lg saturate-200 bg-white/50">
           <ControlledInput
             value={username}
             type="text"
             placeholder="Username"
             onValueChange={setUsername}
+            className="bg-black/50 focus:border-0 focus:scale-105 transition-all"
           />
           <ControlledInput
             value={password}
             type="password"
             placeholder="Password"
             onValueChange={setPassword}
+            className="bg-black/50 focus:border-0 focus:scale-105 transition-all"
           />
           <button
             onClick={() => handleLogin(username, password, navigate, notify)}
+            className="bg-black/80"
           >
             Sign in
           </button>

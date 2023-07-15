@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import {
   faGears,
   faRightFromBracket,
@@ -6,7 +7,10 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link, Outlet } from "react-router-dom";
 import { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
+export const notify = (text) => toast(text);
 const logout = () => {
   sessionStorage.clear();
   location.replace("/login");
@@ -40,7 +44,7 @@ const UserDropdown = ({ user }) => {
   );
 };
 
-const Navbar = () => {
+export const Navbar = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   return (
     <div>
@@ -66,11 +70,10 @@ const Navbar = () => {
           )}
         </div>
       </div>
-      <div className="textured-bg">
+      <div className="textured-bg bg-cover min-h-screen lg:bg-cover">
         <Outlet />
       </div>
+      <ToastContainer theme="dark" />
     </div>
   );
 };
-
-export default Navbar;

@@ -1037,13 +1037,13 @@ const countries = [
 const RegisterDetails = ({ userDetails, setUserDetails }) => {
   const navigate = useNavigate();
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 rounded-xl backdrop-blur-lg saturate-200 bg-white/50 p-4">
       {" "}
       <Select
         onChange={(value) => {
           setUserDetails({ ...userDetails, country: value.value });
         }}
-        className="text-black bg-stone-600"
+        className="text-black"
         options={countries}
         placeholder="Country"
       />
@@ -1051,6 +1051,8 @@ const RegisterDetails = ({ userDetails, setUserDetails }) => {
         onValueChange={(file) =>
           setUserDetails({ ...userDetails, profilePicture: file })
         }
+        accept="image/*"
+        className="bg-black/50 focus:border-0 focus:scale-105 transition-all"
       />
       <button onClick={() => handleRegister(userDetails, navigate)}>
         Register
@@ -1060,13 +1062,14 @@ const RegisterDetails = ({ userDetails, setUserDetails }) => {
 };
 const AccountInfo = ({ userDetails, setUserDetails, changeBox }) => {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 p-4 rounded-xl backdrop-blur-lg saturate-200 bg-white/50">
       <ControlledInput
         placeholder="Username"
         value={userDetails.username}
         onValueChange={(text) =>
           setUserDetails({ ...userDetails, username: text })
         }
+        className="bg-black/50 focus:border-0 focus:scale-105 transition-all"
       />
       <ControlledInput
         placeholder="Password"
@@ -1074,6 +1077,7 @@ const AccountInfo = ({ userDetails, setUserDetails, changeBox }) => {
         onValueChange={(text) =>
           setUserDetails({ ...userDetails, password: text })
         }
+        className="bg-black/50 focus:border-0 focus:scale-105 transition-all"
         type="password"
       />
       <button className="bg-transparent" onClick={() => changeBox(1)}>
@@ -1094,7 +1098,7 @@ const SignUp = () => {
 
   return (
     <>
-      <div className="flex items-center justify-center loginPage h-screen">
+      <div className="flex items-center justify-center registerPage h-screen">
         {view === 0 ? (
           <AccountInfo
             changeBox={setView}

@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import axios from "axios";
-import { useEffect, useState } from "react";
-
+import { useEffect, useState, useRef } from "react";
+import autoAnimate from "@formkit/auto-animate";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRight,
@@ -15,8 +15,9 @@ import Select from "react-select";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
-import { handlePostUpload } from "../api";
+import { getComments } from "../api";
 const notify = (text) => toast(text);
+import { url } from "../main";
 
 export const ControlledInput = ({ value, onValueChange, ...rest }) => {
   return (
@@ -27,7 +28,7 @@ export const ControlledInput = ({ value, onValueChange, ...rest }) => {
     />
   );
 };
-const ControlledFileInput = ({ onValueChange, ...rest }) => {
+export const ControlledFileInput = ({ onValueChange, ...rest }) => {
   return (
     <input
       onChange={({ target: { files } }) => onValueChange(files[0])}
@@ -36,7 +37,7 @@ const ControlledFileInput = ({ onValueChange, ...rest }) => {
     />
   );
 };
-export const VotingSystem = ({ voting, handleVoting }) => {
+export const VotingSystem = ({ voting, handleVoting, index }) => {
   return (
     <div className="flex flex-row gap-2 items-center justify-center">
       <FontAwesomeIcon
@@ -44,7 +45,7 @@ export const VotingSystem = ({ voting, handleVoting }) => {
           (voting.hadVotedPlus ? "text-green-500" : "") +
           " cursor-pointer p-1 hover:bg-indigo-800 rounded-full"
         }
-        onClick={() => handleVoting("plus")}
+        onClick={() => handleVoting("plus", index)}
         icon={faPlus}
       />
       {voting.votes}
@@ -53,7 +54,7 @@ export const VotingSystem = ({ voting, handleVoting }) => {
           (voting.hadVotedMinus ? "text-green-500" : "") +
           " cursor-pointer p-1 hover:bg-indigo-800 rounded-full"
         }
-        onClick={() => handleVoting("minus")}
+        onClick={() => handleVoting("minus", index)}
         icon={faMinus}
       />
     </div>
@@ -68,12 +69,12 @@ export const PostDetails = ({ post, handleClose }) => {
           <p className="text-gray-500 text-sm text-center">{post.postAuthor}</p>
           <h2 className="text-xl text-center">{post.postTitle}</h2>
           <a
-            href={`http://localhost:3000/${post.postImage}`}
+            href={`${url}/${post.postImage}`}
             target="_blank"
             rel="noreffer noreferrer"
           >
             <img
-              src={`http://localhost:3000/${post.postImage}`}
+              src={`${url}/${post.postImage}`}
               className=" max-w-[400px] max-h-[400px] self-center"
               alt=""
             />
@@ -90,19 +91,26 @@ export const PostDetails = ({ post, handleClose }) => {
     </div>
   );
 };
-export const Comments = ({ post, retrigger }) => {
+export const Comments = ({ post, retrigger, comments }) => {
   const [newComment, setNewComment] = useState({
     content: "",
-    author: "admin",
+    author: sessionStorage.getItem("username"),
     timestamp: new Date(),
   });
-  const [voting, setVoting] = useState({
+  const parentRef = useRef();
+
+  useEffect(() => {
+    if (parentRef.current) {
+      autoAnimate(parentRef.current);
+    }
+  }, [parentRef]);
+  /* const [voting, setVoting] = useState({
     votes: post.postVotes,
     hadVotedPlus: false,
     hadVotedMinus: false,
-  });
+  }); */
 
-  const handleVoting = (action) => {
+  /*  const handleVoting = (action, index) => {
     if (action === "plus") {
       if (!voting.hadVotedPlus) {
         setVoting({
@@ -112,12 +120,12 @@ export const Comments = ({ post, retrigger }) => {
           votes: post.postVotes + 1,
         });
         axios.put(
-          `http://localhost:3000/api/posts/${post._id}/comments/changeVote?action=plus`
+          `${url}/api/posts/${post._id}/comments/${index}/changeVote?action=plus`
         );
         retrigger("sad");
       }
     } else {
-      if (!voting.hadVotedMinus) {
+      if ((!voting.hadVotedMinus, index)) {
         setVoting({
           ...voting,
           hadVotedPlus: false,
@@ -125,19 +133,16 @@ export const Comments = ({ post, retrigger }) => {
           votes: post.postVotes - 1,
         });
         axios.put(
-          `http://localhost:3000/api/posts/${post._id}/comments/changeVote?action=minus`
+          `${url}/api/posts/${post._id}/comments//changeVote?action=minus`
         );
         retrigger("nis");
       }
     }
-  };
+  }; */
 
   const postComment = () => {
     axios
-      .post(
-        `http://localhost:3000/api/posts/${post._id}/comments/add`,
-        newComment
-      )
+      .post(`${url}/api/posts/${post._id}/comments/add`, newComment)
       .then((res) => {
         if (res.status === 200) {
           notify("Comment submited");
@@ -149,7 +154,7 @@ export const Comments = ({ post, retrigger }) => {
   return (
     <div className="w-[350px] h-[350px] w-max-[400px] h-max-[400px] overflow-auto">
       <h2 className="text-xl p-4">Comments </h2>
-      <div className="flex flex-col gap-4 items-center p-4 ">
+      <div className="flex flex-col gap-4 items-center p-4 animate">
         <div className="bg-[#242424] w-full p-2 rounded-lg flex flex-row justify-between items-center gap-2 ">
           <ControlledInput
             value={newComment.content}
@@ -164,11 +169,17 @@ export const Comments = ({ post, retrigger }) => {
             icon={faArrowRight}
           />
         </div>
-        {post.postComments?.map((comment, index) => (
+        {comments?.map((comment, index) => (
           <div className="bg-[#242424] w-full p-3 rounded-lg" key={index}>
-            <p className="text-sm text-emerald-700">{comment.author}</p>
+            <p className="text-sm text-emerald-700">
+              <Link to={`/user/${comment.author}`}>{comment.author}</Link>
+            </p>
             <p className="text-left">{comment.content}</p>
-            <VotingSystem voting={voting} handleVoting={handleVoting} />
+            {/* <VotingSystem
+                voting={voting}
+                index={index}
+                handleVoting={handleVoting}
+              /> */}
           </div>
         ))}
       </div>
@@ -182,6 +193,11 @@ export const Post = ({ postInfo, retrigger }) => {
     hadVotedMinus: false,
   });
   const [commentsShown, setCommentsShown] = useState(false);
+  const [comments, setComments] = useState([]);
+
+  useEffect(() => {
+    getComments(postInfo._id).then((comments) => setComments(comments.data));
+  }, [postInfo]);
 
   const handleVoting = (action) => {
     if (action === "plus") {
@@ -193,7 +209,7 @@ export const Post = ({ postInfo, retrigger }) => {
           votes: postInfo.postVotes + 1,
         });
         axios.put(
-          `http://localhost:3000/api/posts/modify/${postInfo._id}/changeVote?action=plus`
+          `${url}/api/posts/modify/${postInfo._id}/changeVote?action=plus`
         );
         retrigger("sad");
       }
@@ -206,7 +222,7 @@ export const Post = ({ postInfo, retrigger }) => {
           votes: postInfo.postVotes - 1,
         });
         axios.put(
-          `http://localhost:3000/api/posts/modify/${postInfo._id}/changeVote?action=minus`
+          `${url}/api/posts/modify/${postInfo._id}/changeVote?action=minus`
         );
         retrigger("nis");
       }
@@ -217,24 +233,22 @@ export const Post = ({ postInfo, retrigger }) => {
       {!commentsShown ? (
         <div className="relative">
           <img
-            src={`http://localhost:3000/${postInfo.postImage}`}
+            src={`${url}/${postInfo.postImage}`}
             className={
-              "w-[350px] h-[350px] w-max-[400px] h-max-[400px] bg-no-repeat bg-center bg-cover rounded-t-xl "
+              "w-full aspect-square bg-no-repeat bg-center bg-cover rounded-t-xl "
             }
           />
           <p className="absolute bottom-2 left-1/2 translate-x-[-50%] bg-stone-800 opacity-70 text-white rounded-lg px-2 py-1">
-            <a
-              href={`http://localhost:3000/${postInfo.postImage}`}
-              target="_blank"
-              rel="noreferrer"
+            <Link
+              to={`/post/${postInfo._id}`}
               className="text-white hover:text-white"
             >
               See full image
-            </a>
+            </Link>
           </p>
         </div>
       ) : (
-        <Comments retrigger={retrigger} post={postInfo} />
+        <Comments comments={comments} retrigger={retrigger} post={postInfo} />
       )}
       <p className=""></p>
       <h2 className="text-xl text-center">
@@ -264,58 +278,16 @@ export const Post = ({ postInfo, retrigger }) => {
             className="text-center cursor-pointer transition-all hover:text-black rounded-lg px-2"
           >
             <FontAwesomeIcon className="mr-2" icon={faComment} />
-            Comments({postInfo.postComments.length})
+            Comments({comments.length})
           </p>
         )}
       </div>
     </div>
   );
 };
-export const NewPostModal = ({ handleClose, retrigger }) => {
-  const [newPostData, setNewPostData] = useState({
-    postTitle: "",
-    postAuthor: sessionStorage.getItem("username"),
-    postVotes: 1,
-    postTimestamp: new Date(),
-    postComments: [],
-    postImage: "",
-  });
-
-  return (
-    <>
-      <div className="absolute top-1/2 left-1/2 bg-emerald-700 rounded-xl translate-x-[-50%] z-30 translate-y-[-50%] p-2 m-4">
-        <div className="flex flex-col space-y-4">
-          <h1>Create a post</h1>
-          <ControlledInput
-            value={newPostData.postTitle}
-            onValueChange={(value) =>
-              setNewPostData({ ...newPostData, postTitle: value })
-            }
-            placeholder="Post title"
-          />
-          <ControlledFileInput
-            accept="image/png, image/jpeg"
-            onValueChange={(file) =>
-              setNewPostData({ ...newPostData, postImage: file })
-            }
-          />
-          <button
-            onClick={() =>
-              handlePostUpload(newPostData, notify, handleClose, retrigger)
-            }
-          >
-            Create
-          </button>
-        </div>
-      </div>
-      <div className="absolute w-full h-full top-0 left-0 z-20 bg-black/50"></div>
-    </>
-  );
-};
 
 export const Posts = () => {
   const [posts, setPosts] = useState([]);
-  const [modalShown, setModalShown] = useState(false);
   const [detailedPost, setDetailedPost] = useState({
     post: {},
     isShown: false,
@@ -324,17 +296,12 @@ export const Posts = () => {
   const [query, setQuery] = useState("latest");
   //const [msg, setMsg] = useState("");
   useEffect(() => {
-    axios
-      .get(`http://localhost:3000/api/posts/query?sort=${query}`)
-      .then((res) => {
-        setPosts(res.data);
-      });
+    axios.get(`${url}/api/posts/query?sort=${query}`).then((res) => {
+      setPosts(res.data);
+    });
     console.log(query);
   }, [trigger, query]);
 
-  const handleModalClose = () => {
-    setModalShown(false);
-  };
   const handleCloseDetails = () => {
     setDetailedPost({ ...detailedPost, isShown: false });
   };
@@ -355,14 +322,11 @@ export const Posts = () => {
   ];
 
   return (
-    <div className="flex flex-row justify-center">
+    <div className="flex flex-row justify-center backdrop-blur-sm bg-white/10">
       <div className="flex flex-col">
         <div className="flex flex-row items-center">
-          <button
-            className="m-4 bg-emerald-700 hover:border-white hover:border hover:scale-105 transition-transform"
-            onClick={() => setModalShown(true)}
-          >
-            Create a new post
+          <button className="m-4 bg-emerald-700 hover:border-white hover:border hover:scale-105 transition-transform">
+            <Link to={"/new"}>Create a new post</Link>
           </button>
           <Select
             defaultValue={query}
@@ -395,9 +359,6 @@ export const Posts = () => {
           <h1 className="text-center text-2xl">Loading...</h1>
         )}
       </div>
-      {modalShown && (
-        <NewPostModal handleClose={handleModalClose} retrigger={setTrigger} />
-      )}
       {detailedPost.isShown && (
         <PostDetails
           post={detailedPost.post}
