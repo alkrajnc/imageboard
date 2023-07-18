@@ -3,7 +3,7 @@ import axios from "axios";
 function setToken(userToken) {
   sessionStorage.setItem("token", JSON.stringify(userToken));
 }
-import { url } from "./main";
+const url = "http://localhost:3000";
 
 export const handleLogin = async (username, password, navigate, notify) => {
   axios
@@ -16,8 +16,12 @@ export const handleLogin = async (username, password, navigate, notify) => {
       sessionStorage.setItem("username", username);
       navigate("/posts");
     })
-    .catch(() => {
-      notify("An error ocurred.");
+    .catch((err) => {
+      if (err.response.status === 403) {
+        notify(err.response.data.msg);
+      } else {
+        notify("An error ocurred.");
+      }
     });
 };
 export const handleRegister = async (userDetails, navigate) => {
@@ -72,6 +76,11 @@ export const postComment = (post, newComment, notify, retrigger) => {
       if (res.status === 200) {
         notify("Comment submited");
         retrigger("fssdf");
+      } else {
+        notify("Comment not posted. Error");
       }
     });
+};
+export const getBoards = async () => {
+  return axios.get(`${url}/api/boards`);
 };

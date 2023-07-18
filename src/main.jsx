@@ -11,7 +11,14 @@ import { User } from "./routes/user";
 import PostDetails from "./routes/PostDetails";
 import { postLoader, userLoader } from "./loaders";
 import NewPost from "./routes/NewPost";
+import { toast, ToastContainer } from "react-toastify";
+import Boards from "./routes/Boards";
 export const url = "http://localhost:3000";
+
+const notify = (text) => {
+  toast(text);
+};
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -22,6 +29,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <Posts />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "boards",
+        element: (
+          <ProtectedRoute>
+            <Boards />
           </ProtectedRoute>
         ),
       },
@@ -59,5 +74,6 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <RouterProvider router={router} />
+    <ToastContainer />
   </React.StrictMode>
 );

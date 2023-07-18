@@ -36,6 +36,15 @@ export const User = () => {
   };
 
   const UserPosts = () => {
+    if (userData.posts === undefined || userData.posts.length === 0) {
+      return (
+        <div className="flex justify-center items-center mt-6">
+          <h2 className="text-center text-2xl md:text-3xl">
+            User has not posted any content
+          </h2>
+        </div>
+      );
+    }
     return (
       <div className="grid mt-6 grid-cols-1 md:grid-cols-2 gap-6">
         {userData.posts?.map((post, index) => (
@@ -79,8 +88,8 @@ export const User = () => {
   };
 
   return (
-    <div className="flex justify-center backdrop-blur-[2px]">
-      <div className="lg:w-1/2">
+    <div className="flex justify-center ">
+      <div className="lg:w-1/2 w-10/12">
         <div className="bg-emerald-800 p-4 rounded-b-xl">
           <img
             src={`${url}/${userData?.profilePicture}`}
@@ -105,7 +114,7 @@ export const User = () => {
             days ago
           </p>
         </div>
-        <div className="mt-6 flex flex-row gap-4">
+        <div className="mt-6 flex flex-row gap-4 md:justify-start justify-center">
           <button className="bg-emerald-700" onClick={() => setView("posts")}>
             Posts
           </button>

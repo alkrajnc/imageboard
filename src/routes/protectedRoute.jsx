@@ -21,7 +21,7 @@ const ProtectedRoute = ({ children }) => {
         .then((res) => {
           console.log(res);
           if (res.status === 200) {
-            navigate("/posts");
+            console.log("");
           }
         })
         .catch((err) => {

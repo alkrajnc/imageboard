@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ControlledInput, ControlledFileInput } from "./posts";
 import { handlePostUpload } from "../api";
-import { notify } from "./navbar";
+//import { notify } from "./navbar";
 const NewPost = () => {
   const [newPostData, setNewPostData] = useState({
     postTitle: "",

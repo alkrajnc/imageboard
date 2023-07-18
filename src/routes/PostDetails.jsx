@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { getComments, getPost, postComment } from "../api";
 import { url } from "../main";
-import { notify } from "./navbar";
+    // import { notify } from "./navbar";
 import { ControlledInput } from "./posts";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -21,10 +21,10 @@ const PostDetails = () => {
     getComments(postId).then((res) => setPostComments(res.data));
     getPost(postId).then((res) => setPostData(res.data));
   }, [postId, trigger]);
-  console.log(postData);
+  //console.log(postData);
 
   return (
-    <div className="flex flex-col items-center h-full">
+    <div className="flex flex-col items-center">
       <div className="bg-emerald-800 rounded-b-xl w-3/4 p-2 mb-4">
         <h2 className="text-2xl text-center">{postData.postTitle}</h2>
       </div>
@@ -35,7 +35,7 @@ const PostDetails = () => {
           alt=""
         />
       </div>
-      <div className="lg:w-1/2 mt-6 w-3/4">
+      <div className="lg:w-1/2 mt-6 w-3/4 mb-8">
         <div className="flex flex-col items-start gap-4">
           <div className="bg-[#242424] w-full p-2 rounded-lg flex flex-row justify-between items-center gap-2 ">
             <ControlledInput
@@ -46,9 +46,14 @@ const PostDetails = () => {
               placeholder="Comment"
             />
             <FontAwesomeIcon
-              onClick={() =>
-                postComment(postData, newComment, notify, setTrigger)
-              }
+              onClick={() => {
+                postComment(postData, newComment, null, setTrigger);
+                setNewComment({
+                  content: "",
+                  author: sessionStorage.getItem("username"),
+                  timestamp: new Date(),
+                });
+              }}
               className="ml-4 bg-stone-900 text-white rounded-lg px-4 py-2"
               icon={faArrowRight}
             />
