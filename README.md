@@ -98,7 +98,7 @@ _Installation instructions_
    ```
 2. Install YARN packages
    ```sh
-   cd Projekcija
+   cd imageboard
    yarn
    yarn run dev
    ```
