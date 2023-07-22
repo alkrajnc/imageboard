@@ -13,7 +13,7 @@ import { postLoader, userLoader } from "./loaders";
 import NewPost from "./routes/NewPost";
 import { toast, ToastContainer } from "react-toastify";
 import Boards from "./routes/Boards";
-export const url = "http://localhost:3000";
+export const url = "http://109.182.65.198:3000";
 
 const notify = (text) => {
   toast(text);
